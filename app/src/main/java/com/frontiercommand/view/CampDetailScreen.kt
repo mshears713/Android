@@ -18,6 +18,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.frontiercommand.ui.theme.PioneerTheme
 import com.frontiercommand.viewmodel.CampViewModel
+import com.frontiercommand.viewmodel.CommandViewModel
 import kotlinx.coroutines.delay
 
 /**
@@ -63,10 +64,14 @@ fun CampDetailScreen(
     navController: NavController,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: CampViewModel = viewModel()
+    viewModel: CampViewModel = viewModel(),
+    commandViewModel: CommandViewModel = viewModel()
 ) {
     // Get the camp from ViewModel
     val camp = viewModel.getCampById(campId)
+
+    // Collect command history for CommandConsole
+    val commands by commandViewModel.commands.collectAsState()
 
     // Handle invalid campId with auto-return to home
     if (camp == null) {
@@ -246,13 +251,13 @@ fun CampDetailScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Placeholder for future camp-specific content
+            // Command Console - Interactive terminal
             Divider()
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Camp Content",
+                text = "Interactive Command Console",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -260,35 +265,56 @@ fun CampDetailScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Camp-specific interactive content will be added in Phase 2:",
-                style = MaterialTheme.typography.bodyMedium
+                text = "Try commands like: GET /status, GET /devices, HELP",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            // Placeholder content boxes
+            // CommandConsole component
+            CommandConsole(
+                commands = commands,
+                onSendCommand = { commandText ->
+                    commandViewModel.executeCommand(commandText)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Instructions card
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer
                 )
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "• CommandConsole (Step 13)",
-                        style = MaterialTheme.typography.bodyMedium
+                        text = "💡 Quick Start",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "• Type HELP to see all available commands",
+                        style = MaterialTheme.typography.bodySmall
                     )
                     Text(
-                        text = "• Interactive tutorials and demonstrations",
-                        style = MaterialTheme.typography.bodyMedium
+                        text = "• Use GET <url> to fetch data from endpoints",
+                        style = MaterialTheme.typography.bodySmall
                     )
                     Text(
-                        text = "• Code examples and explanations",
-                        style = MaterialTheme.typography.bodyMedium
+                        text = "• Use POST <url> <body> to send data",
+                        style = MaterialTheme.typography.bodySmall
                     )
                     Text(
-                        text = "• Schematic diagrams",
-                        style = MaterialTheme.typography.bodyMedium
+                        text = "• Type CLEAR to clear command history",
+                        style = MaterialTheme.typography.bodySmall
                     )
                 }
             }
