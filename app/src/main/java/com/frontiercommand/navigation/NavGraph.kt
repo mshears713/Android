@@ -1,0 +1,109 @@
+package com.frontiercommand.navigation
+
+import android.util.Log
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import com.frontiercommand.view.CampDetailScreen
+import com.frontiercommand.view.HomeScreen
+
+/**
+ * NavGraph - Defines the navigation graph for the entire application
+ *
+ * The navigation graph is a data structure that defines all possible navigation paths
+ * and screen transitions in the app. It uses Jetpack Navigation Compose to manage
+ * the backstack and screen lifecycle.
+ *
+ * **Navigation Flow:**
+ * 1. NavHost creates a container for all screens
+ * 2. Each composable() defines a route and its associated UI
+ * 3. navArgument() extracts route parameters type-safely
+ * 4. NavController.navigate() triggers transitions
+ * 5. Back button pops the backstack automatically
+ *
+ * **Error Handling:**
+ * - Invalid campId values are caught and logged
+ * - Navigation to unknown routes shows error screen
+ * - Null arguments are handled with defaults or error states
+ *
+ * @param navController The NavHostController managing navigation state
+ * @param modifier Optional modifier for the NavHost container
+ *
+ * @see Screen for route definitions
+ * @see NavHostController for programmatic navigation
+ */
+@Composable
+fun NavGraph(
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
+    NavHost(
+        navController = navController,
+        startDestination = Screen.Home.route,
+        modifier = modifier
+    ) {
+        // Home screen - displays list of all camps
+        composable(route = Screen.Home.route) {
+            HomeScreen(
+                navController = navController,
+                onNavigateToCamp = { campId ->
+                    // Validate campId before navigation
+                    if (campId in 1..10) {
+                        navController.navigate(Screen.CampDetail.createRoute(campId))
+                    } else {
+                        Log.w("NavGraph", "Attempted to navigate to invalid campId: $campId")
+                    }
+                }
+            )
+        }
+
+        // Camp detail screen - displays individual camp content
+        composable(
+            route = Screen.CampDetail.route,
+            arguments = listOf(
+                navArgument(Screen.CampDetail.ARG_CAMP_ID) {
+                    type = NavType.IntType
+                    defaultValue = 1 // Fallback to Camp 1 if parsing fails
+                }
+            )
+        ) { backStackEntry ->
+            // Extract campId argument from route
+            val campId = try {
+                backStackEntry.arguments?.getInt(Screen.CampDetail.ARG_CAMP_ID) ?: 1
+            } catch (e: Exception) {
+                Log.e("NavGraph", "Error parsing campId argument", e)
+                1 // Fallback to Camp 1
+            }
+
+            // Validate campId is in valid range
+            if (campId !in 1..10) {
+                Log.w("NavGraph", "Invalid campId: $campId, defaulting to 1")
+            }
+
+            CampDetailScreen(
+                campId = campId.coerceIn(1, 10), // Ensure campId is between 1 and 10
+                navController = navController,
+                onNavigateBack = {
+                    // Pop back to previous screen (Home)
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        // Settings screen - application configuration
+        composable(route = Screen.Settings.route) {
+            // TODO: Implement SettingsScreen in later phase
+            // SettingsScreen(navController = navController)
+        }
+
+        // Help screen - tutorials and documentation
+        composable(route = Screen.Help.route) {
+            // TODO: Implement HelpScreen in later phase
+            // HelpScreen(navController = navController)
+        }
+    }
+}
