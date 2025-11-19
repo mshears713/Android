@@ -8,8 +8,11 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.frontiercommand.view.CampDetailScreen
 import com.frontiercommand.view.HomeScreen
+import com.frontiercommand.view.SettingsScreen
+import com.frontiercommand.view.camps.*
 
 /**
  * NavGraph - Defines the navigation graph for the entire application
@@ -47,7 +50,17 @@ fun NavGraph(
         modifier = modifier
     ) {
         // Home screen - displays list of all camps
-        composable(route = Screen.Home.route) {
+        composable(
+            route = Screen.Home.route,
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "frontiercommand://home"
+                },
+                navDeepLink {
+                    uriPattern = "https://frontiercommand.app/"
+                }
+            )
+        ) {
             HomeScreen(
                 navController = navController,
                 onNavigateToCamp = { campId ->
@@ -69,6 +82,16 @@ fun NavGraph(
                     type = NavType.IntType
                     defaultValue = 1 // Fallback to Camp 1 if parsing fails
                 }
+            ),
+            deepLinks = listOf(
+                // Deep link: frontiercommand://camp/1
+                navDeepLink {
+                    uriPattern = "frontiercommand://camp/{${Screen.CampDetail.ARG_CAMP_ID}}"
+                },
+                // Deep link: https://frontiercommand.app/camp/1
+                navDeepLink {
+                    uriPattern = "https://frontiercommand.app/camp/{${Screen.CampDetail.ARG_CAMP_ID}}"
+                }
             )
         ) { backStackEntry ->
             // Extract campId argument from route
@@ -84,24 +107,52 @@ fun NavGraph(
                 Log.w("NavGraph", "Invalid campId: $campId, defaulting to 1")
             }
 
-            CampDetailScreen(
-                campId = campId.coerceIn(1, 10), // Ensure campId is between 1 and 10
-                navController = navController,
-                onNavigateBack = {
-                    // Pop back to previous screen (Home)
-                    navController.popBackStack()
-                }
-            )
+            // Route to specific camp implementation based on campId
+            when (campId.coerceIn(1, 10)) {
+                1 -> Camp1RestBasics()
+                2 -> Camp2WebSocket()
+                3 -> Camp3GpsIntegration()
+                4 -> Camp4OfflineCaching()
+                5 -> Camp5StateManagement()
+                6 -> Camp6AdvancedNavigation()
+                7 -> Camp7DataPersistence()
+                else -> CampDetailScreen(
+                    campId = campId.coerceIn(1, 10),
+                    navController = navController,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
         }
 
         // Settings screen - application configuration
-        composable(route = Screen.Settings.route) {
-            // TODO: Implement SettingsScreen in later phase
-            // SettingsScreen(navController = navController)
+        composable(
+            route = Screen.Settings.route,
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "frontiercommand://settings"
+                },
+                navDeepLink {
+                    uriPattern = "https://frontiercommand.app/settings"
+                }
+            )
+        ) {
+            SettingsScreen(navController = navController)
         }
 
         // Help screen - tutorials and documentation
-        composable(route = Screen.Help.route) {
+        composable(
+            route = Screen.Help.route,
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "frontiercommand://help"
+                },
+                navDeepLink {
+                    uriPattern = "https://frontiercommand.app/help"
+                }
+            )
+        ) {
             // TODO: Implement HelpScreen in later phase
             // HelpScreen(navController = navController)
         }
