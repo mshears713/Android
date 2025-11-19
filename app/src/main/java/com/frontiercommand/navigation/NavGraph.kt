@@ -119,6 +119,7 @@ fun NavGraph(
                 7 -> Camp7DataPersistence()
                 8 -> Camp8BackgroundProcessing()
                 9 -> Camp9SystemIntegration()
+                10 -> Camp10Deployment()
                 else -> CampDetailScreen(
                     campId = campId.coerceIn(1, 10),
                     navController = navController,

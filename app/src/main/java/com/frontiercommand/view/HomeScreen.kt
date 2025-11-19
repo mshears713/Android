@@ -6,6 +6,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Help
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -75,6 +77,28 @@ fun HomeScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Frontier Command Center") },
+                actions = {
+                    // Help button
+                    IconButton(
+                        onClick = { navController.navigate("help") }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Help,
+                            contentDescription = "Help & Documentation",
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                    // Settings button
+                    IconButton(
+                        onClick = { navController.navigate("settings") }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = "Settings",
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
