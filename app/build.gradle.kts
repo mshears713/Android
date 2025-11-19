@@ -102,6 +102,9 @@ dependencies {
     // Google Play Services Location - GPS and location services
     implementation("com.google.android.gms:play-services-location:21.0.1")
 
+    // WorkManager - background task scheduling and execution
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+
     // Testing dependencies
     // JUnit5 - unit testing framework
     testImplementation("junit:junit:4.13.2")

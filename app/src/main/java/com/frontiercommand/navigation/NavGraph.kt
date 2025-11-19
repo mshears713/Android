@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.frontiercommand.view.CampDetailScreen
+import com.frontiercommand.view.HelpScreen
 import com.frontiercommand.view.HomeScreen
 import com.frontiercommand.view.SettingsScreen
 import com.frontiercommand.view.camps.*
@@ -116,6 +117,8 @@ fun NavGraph(
                 5 -> Camp5StateManagement()
                 6 -> Camp6AdvancedNavigation()
                 7 -> Camp7DataPersistence()
+                8 -> Camp8BackgroundProcessing()
+                9 -> Camp9SystemIntegration()
                 else -> CampDetailScreen(
                     campId = campId.coerceIn(1, 10),
                     navController = navController,
@@ -153,8 +156,7 @@ fun NavGraph(
                 }
             )
         ) {
-            // TODO: Implement HelpScreen in later phase
-            // HelpScreen(navController = navController)
+            HelpScreen(navController = navController)
         }
     }
 }
