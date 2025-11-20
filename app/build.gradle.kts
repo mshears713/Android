@@ -102,9 +102,18 @@ dependencies {
     // Google Play Services Location - GPS and location services
     implementation("com.google.android.gms:play-services-location:21.0.1")
 
+    // WorkManager - background task scheduling and execution
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+
     // Testing dependencies
-    // JUnit5 - unit testing framework
+    // JUnit4 - unit testing framework
     testImplementation("junit:junit:4.13.2")
+
+    // Kotlin Coroutines Test - testing coroutines and suspend functions
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+
+    // MockK - Kotlin mocking library
+    testImplementation("io.mockk:mockk:1.13.8")
 
     // AndroidX Test - instrumented testing on Android devices/emulators
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

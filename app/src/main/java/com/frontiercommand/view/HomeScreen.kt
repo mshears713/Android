@@ -6,6 +6,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Help
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -21,6 +23,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.frontiercommand.model.Camp
+import com.frontiercommand.ui.accessibility.buildContentDescription
+import com.frontiercommand.ui.accessibility.heading
+import com.frontiercommand.ui.accessibility.liveRegion
 import com.frontiercommand.viewmodel.CampViewModel
 
 /**
@@ -74,7 +79,40 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Frontier Command Center") },
+                title = {
+                    Text(
+                        "Frontier Command Center",
+                        modifier = Modifier.heading(1)
+                    )
+                },
+                actions = {
+                    // Help button
+                    IconButton(
+                        onClick = { navController.navigate("help") },
+                        modifier = Modifier.semantics {
+                            contentDescription = "Open help and documentation"
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Help,
+                            contentDescription = null, // ContentDescription on IconButton instead
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                    // Settings button
+                    IconButton(
+                        onClick = { navController.navigate("settings") },
+                        modifier = Modifier.semantics {
+                            contentDescription = "Open settings"
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = null, // ContentDescription on IconButton instead
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -87,16 +125,21 @@ fun HomeScreen(
             Box(
                 modifier = modifier
                     .fillMaxSize()
-                    .padding(paddingValues),
+                    .padding(paddingValues)
+                    .liveRegion(), // Announce empty state to screen readers
                 contentAlignment = Alignment.Center
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.semantics(mergeDescendants = true) {
+                        contentDescription = "No camps available. Check logs for errors."
+                    }
                 ) {
                     Text(
                         text = "No camps available",
-                        style = MaterialTheme.typography.headlineSmall
+                        style = MaterialTheme.typography.headlineSmall,
+                        modifier = Modifier.heading(2)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
@@ -150,11 +193,22 @@ fun CampCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val completionStatus = if (camp.isCompleted) "completed" else "not completed"
+    val cardDescription = buildContentDescription(
+        "Camp ${camp.id}",
+        camp.title,
+        camp.module,
+        completionStatus,
+        "Tap to open"
+    )
+
     Card(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .semantics { contentDescription = "Camp ${camp.id}: ${camp.title}" },
+            .semantics(mergeDescendants = true) {
+                contentDescription = cardDescription
+            },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (camp.isCompleted) {

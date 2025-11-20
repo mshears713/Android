@@ -18,6 +18,9 @@
     <!-- Internet permission for network simulation (though we use placeholders) -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Notification permission for Camp 9 - System Integration (Android 13+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -33,10 +36,61 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.PioneerCamps">
+            <!-- Main launcher intent -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- Deep link support for camp navigation -->
+            <!-- Example: frontiercommand://camp/1 opens Camp 1 directly -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <!-- Custom scheme for app-specific deep links -->
+                <data
+                    android:scheme="frontiercommand"
+                    android:host="camp"
+                    android:pathPrefix="/" />
+            </intent-filter>
+
+            <!-- HTTP/HTTPS deep link support -->
+            <!-- Example: https://frontiercommand.app/camp/1 -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="frontiercommand.app"
+                    android:pathPrefix="/camp" />
+            </intent-filter>
+
+            <!-- Deep link for settings -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="frontiercommand"
+                    android:host="settings" />
+            </intent-filter>
+
+            <!-- Deep link for help -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="frontiercommand"
+                    android:host="help" />
             </intent-filter>
         </activity>
     </application>
